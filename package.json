@@ -1,0 +1,26 @@
+{
+  "name": "music-player",
+  "version": "1.0.0",
+  "description": "Music Player Desktop app using Spotify's SDK, must have a Spotify Premium Subscription",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "nodemon --watch main.js --exec \"electron .\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Rohil-Ali/Music-Player.git"
+  },
+  "author": "Rohil Ali",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Rohil-Ali/Music-Player/issues"
+  },
+  "homepage": "https://github.com/Rohil-Ali/Music-Player#readme",
+  "devDependencies": {
+    "electron": "^38.1.2",
+    "electron-reload": "^2.0.0-alpha.1",
+    "nodemon": "^3.1.10"
+  }
+}
