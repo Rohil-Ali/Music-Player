@@ -6,13 +6,14 @@ const { shell } = require('electron');
 require('dotenv').config();
 const crypto = require('crypto');
 
-const getRandomState = () => crypto.randomBytes(16).toString('hex');
-
 //Electron Reload for renderer process
 require('electron-reload')(__dirname, {
   electron: path.join(__dirname, 'node_modules', '.bin', 'electron'),
   hardResetMethod: 'exit'
 });
+
+const getRandomState = () => crypto.randomBytes(16).toString('hex');
+app.commandLine.appendSwitch('enable-features', 'WidevineCdm');
 
 //Spotify API setup
 const spotifyApi = new SpotifyWebApi({
@@ -21,14 +22,20 @@ const spotifyApi = new SpotifyWebApi({
   redirectUri: process.env.SPOTIFY_REDIRECT_URI  // redirect for OAuth
 });
 
-const scopes = ['streaming', 'user-read-playback-state', 'user-modify-playback-state'];
+const scopes = [
+  'streaming',
+  'user-read-email',
+  'user-read-private',
+  'user-modify-playback-state',
+  'user-read-playback-state'
+];
 
-let win;
+let window;
 let accessToken;
 
 //Main window
 const createWindow = () => {
-  win = new BrowserWindow({
+  window = new BrowserWindow({
     width: 380,
     height: 600,
     webPreferences: {
@@ -37,12 +44,12 @@ const createWindow = () => {
     }
   })
 
-  win.loadFile('src/html/index.html')
+  window.loadFile('src/html/index.html')
 }
 
 app.whenReady().then(() => {
   createWindow();
-  startSpotifyAuth();
+  if (!accessToken) startSpotifyAuth();
 })
 
 app.on('window-all-closed', () => {
@@ -70,10 +77,10 @@ function startSpotifyAuth(){
       spotifyApi.setRefreshToken(data.body['refresh_token']);
 
       res.send('Spotify authenticated! You can close this window.');
-
       // send token to renderer
-      win.webContents.send('spotify-token', accessToken);
-    } catch (err) {
+      window.webContents.send('spotify-token', accessToken);
+    } 
+    catch (err) {
       console.error(err);
       res.send('Error during Spotify authentication');
     }
