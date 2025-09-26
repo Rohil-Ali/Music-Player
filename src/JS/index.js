@@ -25,7 +25,6 @@ window.onSpotifyWebPlaybackSDKReady = () => {
         return;
     }
     createSpotifyPlayer();
-    SpotifyPlayerEvents();
 }
 
 //creates the player
@@ -35,6 +34,7 @@ const createSpotifyPlayer = () => {
         getOAuthToken: cb => { cb(spotifyToken); },
         volume: 0.5
     });
+    SpotifyPlayerEvents()
 }
 
 function SpotifyPlayerEvents() {
@@ -44,6 +44,9 @@ function SpotifyPlayerEvents() {
     player.addListener('ready', ({ device_id }) => {
         console.log('Ready with Device ID', device_id);
         deviceId = device_id;
+
+        playBtn.disabled = false;
+        
     });
 
     //not ready
@@ -60,17 +63,21 @@ function SpotifyPlayerEvents() {
 
     player.connect();
 
+    
+
+    
     playBtn.addEventListener('click', () => {
         if (!deviceId) return alert('Player not ready yet');
             fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
                 method: 'PUT',
-                body: JSON.stringify({ uris: ['spotify:track:5pHJv0bgNsT9nPoK2BjNBn'] }),
+                body: JSON.stringify({ context_uri: 'spotify:playlist:3lSbAiNSaAjw2gVeJprC27' }),
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${spotifyToken}`
                 }
             });
         });
+    
     };
 
 

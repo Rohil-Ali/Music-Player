@@ -1,10 +1,10 @@
 const path = require('path');
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, components, ipcMain } = require('electron');
 const SpotifyWebApi = require('spotify-web-api-node');
 const express = require('express');
 const { shell } = require('electron');
-require('dotenv').config();
 const crypto = require('crypto');
+require('dotenv').config();
 
 //Electron Reload for renderer process
 require('electron-reload')(__dirname, {
@@ -13,7 +13,6 @@ require('electron-reload')(__dirname, {
 });
 
 const getRandomState = () => crypto.randomBytes(16).toString('hex');
-app.commandLine.appendSwitch('enable-features', 'WidevineCdm');
 
 //Spotify API setup
 const spotifyApi = new SpotifyWebApi({
@@ -29,6 +28,29 @@ const scopes = [
   'user-modify-playback-state',
   'user-read-playback-state'
 ];
+
+/*
+  Reminder for my self
+
+  AMD + Electron + Widevine:
+
+  - MF (Windows Media Foundation) decodes Spotify streams (even audio is treated like video).
+  - AMD GPU often fails hardware acceleration → errors in console.
+  - Fix: disable GPU in Electron so MF uses CPU decoding:
+      app.commandLine.appendSwitch('disable-gpu');
+      app.commandLine.appendSwitch('disable-software-rasterizer');
+  - Keep sandbox off if needed:
+      app.commandLine.appendSwitch('no-sandbox');
+
+    GPU acceleration works fine on Intel and Nvidia GPUs. not my 9070xt :(
+    app.commandLine.appendSwitch('no-sandbox');
+    app.commandLine.appendSwitch('disable-gpu');
+    app.commandLine.appendSwitch('disable-software-rasterizer');
+    app.commandLine.appendSwitch('disable-features', 'UseAngle');
+*/
+
+
+
 
 let window;
 let accessToken;
@@ -47,7 +69,9 @@ const createWindow = () => {
   window.loadFile('src/html/index.html')
 }
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
+  await components.whenReady();
+  console.log('Components ready', components.status());
   createWindow();
   if (!accessToken) startSpotifyAuth();
 })

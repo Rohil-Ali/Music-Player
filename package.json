@@ -19,7 +19,7 @@
   },
   "homepage": "https://github.com/Rohil-Ali/Music-Player#readme",
   "devDependencies": {
-    "electron": "^38.1.2",
+    "electron": "github:castlabs/electron-releases#v38.0.0+wvcus",
     "electron-reload": "^2.0.0-alpha.1",
     "nodemon": "^3.1.10"
   },
